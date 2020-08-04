@@ -2,8 +2,10 @@ module.exports = {
     name: "clear",
     description: "Clears messages",
 
-    async run (client, message, args) {
+    async execute(client, message, args) {
 
+        if (!message.member.hasPermission("MANAGE_MESSAGES")) return;
+        
         const amount = args.join(" ");
 
         if(!amount) return message.reply('please provide an amount of messages for me to delete')
@@ -12,12 +14,16 @@ module.exports = {
 
         if(amount < 1) return message.reply(`you need to delete at least one message`)
 
-        await message.channel.messages.fetch({limit: amount}).then(messages => {
+        await message.channel.messages.fetch({limit: amount + 1}).then(messages => {
             message.channel.bulkDelete(messages
     )});
 
 
-    message.channel.send('Success!')
+  message.channel.send('Success!')
+  .then(msg => {
+    msg.delete({ timeout: 5000 })
+  })
+  .catch(console.error);
 
     }
 }
